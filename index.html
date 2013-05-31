@@ -31,7 +31,6 @@
         });
   }
 
-
   function parseAxisLabels(labelStrArray){
      return labelStrArray.map(
         function(bla){
@@ -45,7 +44,7 @@
         });
   }
 
-    function parseLabels(labelStrArray){
+  function parseLabels(labelStrArray){
      return labelStrArray.map(
         function(bla){
           // named groups might help here??
@@ -58,6 +57,73 @@
              hexColor: matches[5],
           };
         });
+  }
+
+
+  function parseDunno(dunnoStrArray){
+     return dunnoStrArray.map(
+        function(bla){
+          // also should prolly share the regex with the partitioner thingy
+          var matches = bla.match(/([\d.]+) ([\d.]+)/);
+          return {
+             a: matches[1], 
+             b: matches[2]
+          };
+        });
+  }
+
+  function parseObjects(objectStrArray){
+     return objectStrArray.map(function(bla){
+        // also should prolly share the regex with the partitioner thingy
+        var match = bla.match(/(\d+) rect from ([\d.]+), ([\d.]+) to ([\d.]+), ([\d.]+) fc rgb "(#[\w]+)"/);
+        // ["1 rect from 92.720745, 11.17 to 94.193395, 11.83 fc rgb "#000000"", "1", "92.720745", "11.17", "94.193395", "11.83", "#000000"
+        return {
+          id : match[1],
+          from : {x: match[2], y: match[3]},
+          to : {x: match[4], y: match[5]},
+          color: match[6]
+        };
+
+     });
+  }
+
+  //"set object 1 rect from 92.720745, 11.17 to 94.193395, 11.83 fc rgb "#000000""
+
+  // /(\d+) from ([\d.])+, ([\d.]) to ([\d.]), ([\d.]) fc rgb "([#\w]+)"/
+
+
+  function parseTics(ticStrArray){
+     return ticStrArray.map(function(bla){
+          // also should prolly share the regex with the partitioner thingy
+          // may want to filter out the empty ones earlier?
+          // ERGH refactor
+          var axis, 
+              tics,
+              foo = bla.match(/set (x|y)tics out nomirror( \((.+)\))?/);
+
+          axis = foo[1];
+
+          if (!foo || !foo[2] || !foo[3]){
+            return {
+               axis: axis,
+               tics: []
+            };
+          }
+
+          tics = foo[3].split(',')
+                      .map(function(i){
+                        var match = i.match(/"(.+)" ([\d.]+)/);
+                        return {
+                          title: match[1], 
+                          position: match[2]
+                        };
+                      });
+
+         return {
+           axis: axis,
+           tics: tics
+         };
+      }); 
   }
 
    // sweet jesus, rename when more awake
@@ -90,6 +156,9 @@
         prettyRanges = parseRanges(out.ranges);
         prettyAxisLabels = parseAxisLabels(out.axisLabels);
         prettyLabels = parseLabels(out.labels);
+        prettyDunno = parseDunno(out.dunno);
+        prettyTics = parseTics(out.tics);
+        prettyObjects = parseObjects(out.objects);
   }
 
 
