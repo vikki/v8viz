@@ -19,36 +19,28 @@
 
    // sweet jesus, rename when more awake
   function findPartsOfOutput(output){
-      // HOLY CRAP REFACTOR THIS :S
       var lines = output.split('\n');
 
-      var regexFilter = function(regex, item, index) {
-         return item.match(regex);
-      };
-
-      var stuffWeWontUseFilter = regexFilter.bind(null, /^((unset key)|(plot)|(set style)|(e)|$)/);
-      var setObjFilter = regexFilter.bind(null, /^set object/);
-      var setLabelFilter = regexFilter.bind(null, /^set label/);
-      var setTicsFilter = regexFilter.bind(null, /^set (x|y)\d?tics/);
-      var setRangeFilter = regexFilter.bind(null, /^set (x|y)\d?range/);
-      var setAxisLabelFilter = regexFilter.bind(null, /^set (x|y)\d?label/);
-      
-      // be nice to refactor this into a split thingy that returns the two lists as like a tuple?
-      // also it'd be awesome if this were chainable
-      // ORR rewrite with underscore groupby - see http://stackoverflow.com/a/11345570/82116
-      var rest = _.reject(lines, stuffWeWontUseFilter);
-      var setObjLines = _.filter(rest, setObjFilter);
-      rest = _.reject(rest, setObjFilter);
-      var setLabelLines = _.filter(rest, setLabelFilter);
-      rest = _.reject(rest, setLabelFilter);
-      var setTicsLines = _.filter(rest, setTicsFilter);
-      rest = _.reject(rest, setTicsFilter);
-      var setRangeLines = _.filter(rest, setRangeFilter);
-      rest = _.reject(rest, setRangeFilter);
-      var setAxisLabelLines = _.filter(rest, setAxisLabelFilter);
-      rest = _.reject(rest, setAxisLabelFilter);
-
-
+      var out = _.chain(lines)
+                 .reject(function(line) {
+                   return line.match(/^((unset key)|(plot)|(set style)|(e)|$)/);
+                  })
+                 .groupBy(function(line) {
+                  // OK the if statement is a little ropey but its still nicer than before.. 
+                  if (line.match(/^set object/)) {
+                    return 'objects';
+                  } else if (line.match(/^set label/)) {
+                    return 'labels';
+                  } else if (line.match(/^set (x|y)\d?tics/)) {
+                    return 'tics';
+                  } else if (line.match(/^set (x|y)\d?range/)) {
+                    return 'ranges';
+                  } else if (line.match(/^set (x|y)\d?label/)) {
+                    return 'axisLabels';
+                  } else {
+                    return 'dunno';
+                  }
+                }).value();
   }
 
 
@@ -70,7 +62,7 @@
       reader.onload = (function(theFile) {
         return function(e) {
         	var contents = e.target.result;
-        	console.log(contents);
+        	//console.log(contents);
             findPartsOfOutput(contents);
         };
       })(f);
