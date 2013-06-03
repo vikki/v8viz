@@ -52,7 +52,7 @@ function drawBla(chart, data) {
 	yScale = d3.scale
 	           .linear()
 	           .domain([0,yMax])
-	           .range([0, 250]);
+	           .range([0, 400]);
 
 	chart.selectAll("rect")
 		 .data(data) 
