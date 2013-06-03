@@ -132,8 +132,6 @@
         out.objects = parseObjects(out.objects);
   }
 
-
-
   function handleFileSelect(evt) {
     var files = evt.target.files; // FileList object
 
@@ -156,7 +154,8 @@
 
             var data = [24, 57, 98, 12];
             var chart = setupChart(out.objects);
-            drawBla(chart, out.objects);
+            drawObjects(chart, out.objects);
+            drawTicks(chart, out.tics[1].tics);
         };
       })(f);
 
