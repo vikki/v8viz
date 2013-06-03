@@ -9,44 +9,31 @@ function setupChart(data) {
 	              .attr("height", height)
 	              .attr("style", "width: " +width + "px; height: " +height +"px;");
 
-
-	// x is A FUNCTION WHICH IS WHY THIS WORKS!!!
-	// range returns a FUNCTION that does the scaling shenanigans with width
-	// unglobal and put on eventual obj
-
-	return chart; // when obj, store chart
+	return chart;
 }
 
 function drawBla(chart, data) {
 	var yMax = 23.5;
-    data = data.map(function(e){
-    	              var width = e.toX - e.fromX; 
-                      e.width = (width >=0) ? width.toFixed(2) : 0;
-                      var height = e.toY - e.fromY;
-                      e.height = (height >=0) ? height.toFixed(2) : 0;
+    data = data.map(function calcWidthAndHeight(e){
+    	              var width,
+    	                  height;
 
-                      e.fromY = yMax - e.fromY;
+    	              width = e.toX - e.fromX; 
+                      e.width = width >= 0 ? width.toFixed(2) : 0;
+
+                      height = e.toY - e.fromY;
+                      e.height = height >= 0 ? height.toFixed(2) : 0;
 
                       return e;
-                    });
+                    })
+                .map(function flipYForD3Axis(e){
+                	e.fromY = yMax - e.fromY;
+                    return e;
+                });
 
-
-    //var data = [24, 57, 98, 12];
-
-
-    var ugh = data.map(function(e){
-          	return e.width;
-          });
-
-    // think carefully about the domain bit :s
-    // maximum value for x scale is the max width, which is the maximum toY :D
-
-     
-    // this kind of scaling is for bar charts, i totally don't get how this is gonna work..
     xScale = d3.scale
           .linear()
           .domain([1.010355,20494.654359999982])
-          //.range([0, chart.style('width')]);
           .range([0, 1000]);
 
 	yScale = d3.scale
