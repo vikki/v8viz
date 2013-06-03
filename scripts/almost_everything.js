@@ -156,6 +156,7 @@
             var chart = setupChart(out.objects);
             drawObjects(chart, out.objects);
             drawTicks(chart, out.tics[1].tics);
+            drawDunno(out.dunno);
         };
       })(f);
 
