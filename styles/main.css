@@ -1,0 +1,21 @@
+.chart {
+  padding-top:  100px;
+  padding-left: 200px;
+}
+
+.axis path, .axis line {
+  fill: none;
+  stroke: black;
+  shape-rendering: crispEdges;
+}
+
+.axis text {
+    font-family: sans-serif;
+    font-size: 11px;
+}
+
+.thumb {
+  height: 75px;
+  border: 1px solid #000;
+  margin: 10px 5px 0 0;
+}

@@ -65,6 +65,7 @@ function drawObjects(chart, data) {
      var chart = d3.select("#graphContents")
 	               .append("g")
 	               .attr('id', 'objects')
+                 .attr('transform', 'translate(0, -15)');
 
 	chart.selectAll("rect")
 		 .data(data) 
