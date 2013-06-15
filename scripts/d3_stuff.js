@@ -1,8 +1,3 @@
-// TODO List :
-// - border (svg or css?) around main chart area
-// - line up bottom of chart + ticks
-// - line up tics and text on y axis
-
 // yeah i know. TODO refactor
 chartHeight = 500;
 chartHeightIncTrimmings = 600;
@@ -37,7 +32,7 @@ drawTicks(chart, data.tics[1].tics);
 var chart = d3.select("svg")
               .append("g")
               .attr('id', 'graphContents')
-              .attr("transform", "translate(270,0)");
+              .attr("transform", "translate(0,0)");
   
   drawObjects(chart, data.objects);
 
@@ -94,62 +89,30 @@ function drawTicks(wibble, data){
     var chart = d3.select("svg")
 	                .append("g")
 	                .attr('id', 'yAxis')
+                  .attr("class", "axis")
                   .attr("transform", "translate(0,0)");
 
-    chart.selectAll(".yrule")
-         .data(data)
-         .enter().append("text")
-         .attr("class", "yrule")
-         .attr("y", function(d, i) { 
-            return yScale(d.position).toFixed(2);
-          })
-         .attr("x", 0)
-         .attr("dx", 0)
-         .text(function(d, i) {
-            return d.title;
-         })
-         .attr("text-anchor", "start");
-
-    chart.selectAll("line")
-     .data(data)
-   .enter().append("line")
-     .attr("x1", 260)
-     .attr("x2", 270)
-     .attr("y1", function(d, i) { 
-            return yScale(d.position - 0).toFixed(2);
-     })
-     .attr("y2", function(d, i) { 
-            return yScale(d.position - 0).toFixed(2);
-      })
-      .style("stroke", "#000");
+      var yAxis = d3.svg.axis()
+                        .scale(yScale)
+                        .orient("left")
+                        .tickValues(_.map(out.tics[1].tics, function(e) {return e.position}))
+                        .tickFormat(function(d){
+                           var ticValue = _.find(out.tics[1].tics, function(o, i) { return o.position === d;});
+                           return ticValue ? ticValue.title : '';
+                        });
+      chart.call(yAxis);
 
 
+      chart = d3.select("svg")
+                .append("g")
+                .attr('id', 'xAxis')
+                .attr("class", "axis")
+                .attr("transform", "translate(0,500)");
 
-      var chart = d3.select("svg")
-                  .append("g")
-                  .attr('id', 'xAxis')
-                  .attr("transform", "translate(270,0)");
-
-	chart.selectAll(".fooline")
-	     .data(xScale.ticks(5))
-	     .enter().append("line")
-	     .attr("x1", xScale)
-	     .attr("x2", xScale)
-	     .attr("y1", chartHeight + 70)
-	     .attr("y2", chartHeight + 90)
-	     .style("stroke", "#ccc");
-
-chart.selectAll(".rule")
-     .data(xScale.ticks(5))
-   .enter().append("text")
-     .attr("class", "rule")
-     .attr("x", xScale)
-     .attr("y", chartHeight + 99)
-     .attr("dy", -3)
-     .attr("text-anchor", "middle")
-     .text(String);
-
-
+      var xAxis = d3.svg.axis()
+                        .scale(xScale);
+      xAxis.ticks(5);  // needed? doesn't seem to be in the input file but its how the output looks
+      chart.call(xAxis);
 }
 
 function drawDunno(data) {
