@@ -28,7 +28,7 @@
   function parseDunno(dunnoStrArray){
     var objectRegexDets = {
       re: /([\d.]+) ([\d.]+)/,
-      groupObjMapping: ['', 'a', 'b']
+      groupObjMapping: ['', 'xValue', 'yValue']
     };
 
     return genericMatcher(dunnoStrArray, objectRegexDets);
@@ -153,10 +153,8 @@
             findPartsOfOutput(contents);
 
             var data = [24, 57, 98, 12];
-            var chart = setupChart(out.objects);
-            drawObjects(chart, out.objects);
-            drawTicks(chart, out.tics[1].tics);
-            drawDunno(out.dunno);
+            var chart = setupChart();
+            drawDets(chart, out);
         };
       })(f);
 
