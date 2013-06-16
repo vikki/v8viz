@@ -1,17 +1,17 @@
 // yeah i know. TODO refactor
 var chartHeight = 500,
     chartHeightIncTrimmings = 600,
-    bottomChartHeight = 200 + 300, //confusion;
-    chartWidth  = 1000;
+    bottomChartHeight = 500,
+    chartWidth  = 1000,
+    chartWidthPlusTrimmings  = 1500;
 
 function setupChart() {
   d3.select("body")
     .append("svg")
     .attr("class", "chart")
-    .attr("width",  chartWidth + 300)
+    .attr("width",  chartWidthPlusTrimmings)
     .attr("height", chartHeightIncTrimmings)
-    .attr("style", "width: " + 1300 + "px; height: " + chartHeightIncTrimmings +"px;");
-
+    .attr("style", "width: " + chartWidthPlusTrimmings + "px; height: " + chartHeightIncTrimmings +"px;");
 
   d3.select("svg")
     .append("g")
@@ -30,6 +30,11 @@ function drawDets(data) {
              .domain([out.ranges[0].from, out.ranges[0].to])
              .range([0, chartHeight]);
 
+  yScale2 = d3.scale
+              .linear()
+              .domain([out.ranges[2].from, out.ranges[2].to])
+              .range([0, bottomChartHeight]);
+
   drawTicks(data.tics[1].tics);
   drawObjects(data.objects);
   drawDunno(data.dunno);
@@ -37,8 +42,8 @@ function drawDets(data) {
 
 // i wanted to call this flip-reverse it sooo bad :P
 // paramName is also a bit lame, reconsider
-function flipYForD3Axis(paramName, e){
-  e[paramName] = out.ranges[0].to - e[paramName];
+function reverseNums(paramName, maxNum, e){
+  e[paramName] = maxNum - e[paramName];
   return e;
 }
 
@@ -58,7 +63,7 @@ function drawObjects(data) {
   }
 
   data = data.map(calcWidthAndHeight)
-             .map(flipYForD3Axis.bind(null, 'fromY'));
+             .map(reverseNums.bind(null, 'fromY', out.ranges[0].to));
 
   objectWrapper = d3.select("#graphContents")
                     .append("g")
@@ -83,7 +88,7 @@ function drawTicks(data){
       xAxis,
       yAxis;
 
-  data = data.map(flipYForD3Axis.bind(null, 'position'));
+  data = data.map(reverseNums.bind(null, 'position', out.ranges[0].to));
 
   yAxisContainer = d3.select("svg")
                      .append("g")
@@ -96,8 +101,8 @@ function drawTicks(data){
                 .orient("left")
                 .tickValues(_.map(out.tics[1].tics, function(e) {return e.position}))
                 .tickFormat(function getTickTitleFromPosition(p){
-                   var ticValue = _.find(out.tics[1].tics, 
-                                         function(o, i) { 
+                   var ticValue = _.find(out.tics[1].tics,
+                                         function(o, i) {
                                            return o.position === p;
                                          });
                    return ticValue ? ticValue.title : '';
@@ -117,28 +122,21 @@ function drawTicks(data){
 }
 
 function drawDunno(data) {
-  // think this is right but there's way too much magic (numbers), need to make it more flexible, scaleable
-  var height = 250,
-      container,
-      yScale2;
+  var container = d3.select("#graphContents")
+                    .append("g")
+                    .attr('id', 'dunno')
+                    .attr('height', bottomChartHeight + 'px');
 
-  yScale2 = d3.scale
-              .linear()
-              .domain([out.ranges[2].from, out.ranges[2].to])
-              .range([0, height]);
-
-  container = d3.select("#graphContents")
-                .append("g")
-                .attr('id', 'dunno')
-                .attr('height', height + 'px');
+  data = _.map(data, reverseNums.bind(null, 'yValue', out.ranges[2].to));
 
   container.selectAll("line")
            .data(data)
            .enter().append("line")
+           .attr('id', function(d, i) {return i;})
            .attr("x1", function(d, i) { return xScale(d.xValue).toFixed(2); })
            .attr("x2", function(d, i) { return xScale(d.xValue).toFixed(2); })
-           .attr("y1", function(d, i) { return yScale2(height).toFixed(2); })
-           .attr("y2", function(d, i) { return yScale2(height - d.yValue).toFixed(2); })
+           .attr("y1", function(d, i) { return yScale2(out.ranges[2].to).toFixed(2); })
+           .attr("y2", function(d, i) { return yScale2(d.yValue).toFixed(2); })
            .style("stroke", "#000");
   }
 
