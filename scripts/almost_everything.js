@@ -19,7 +19,7 @@ function parseAxisLabels(labelStrArray){
 function parseLabels(labelStrArray){
   var objectRegexDets = {
     re: /set label "([^"]*)" at ([\d.]+),([\d.]+) (textcolor rgb "([\w|#]+)")?/,
-    groupObjMapping: ['', 'label', 'from', 'to', '', 'hexColor']
+    groupObjMapping: ['', 'label', 'x', 'y', '', 'hexColor']
   };
 
   return genericMatcher(labelStrArray, objectRegexDets);

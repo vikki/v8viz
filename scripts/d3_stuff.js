@@ -38,6 +38,38 @@ function drawDets(data) {
   drawTicks(data.tics[1].tics);
   drawObjects(data.objects);
   drawDunno(data.dunno);
+  drawLabels(data.labels);
+}
+
+function drawLabels (data) {
+  var container,
+      yVals;
+
+  data = _.map(data, reverseNums.bind(null, 'y', out.ranges[2].to));
+
+  yVals = _.map(data, function(e) { return e.y; });
+
+  yScale3 = d3.scale
+              .linear()
+              .domain([d3.min(yVals), d3.max(yVals)])
+              .range([282, 482]);
+
+  container = d3.select("#graphContents")
+              .append("g")
+              .attr('id', 'labels');
+
+  container.selectAll("text")
+     .data(data)
+     .enter()
+     .append("text")
+     .attr('id', function(d, i) { return i;})
+     .attr("x", function(d, i) { return xScale(d.x).toFixed(2); })
+     .attr("y", function(d, i) { return yScale3 (d.y).toFixed(2); })
+     .attr("font-size", '6px')
+     .attr('fill', function(d, i) { return d.hexColor; })
+     .text(function(d, i) {
+        return d.label;
+     });
 }
 
 // i wanted to call this flip-reverse it sooo bad :P
@@ -71,7 +103,7 @@ function drawObjects(data) {
                     .attr('transform', 'translate(0, -15)');
 
   objectWrapper.selectAll("rect")
-               .data(data) 
+               .data(data)
                .enter()
                .append("rect")
                .attr("id",     function(d, i) { return d.id; })
